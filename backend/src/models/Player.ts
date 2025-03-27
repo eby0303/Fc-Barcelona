@@ -12,10 +12,6 @@ const PlayerSchema = new Schema<PlayerDocument>({
     enum: ['available', 'injured', 'suspended'],
     default: 'available'
   },
-  injuryDetails: {
-    type: { type: String },
-    returnDate: { type: String }
-  },
   lastUpdated: { type: Date, default: Date.now }
 });
 
