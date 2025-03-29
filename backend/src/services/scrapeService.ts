@@ -1,13 +1,15 @@
 import fetch from 'node-fetch';
 import * as cheerio from 'cheerio';
+import fs from 'fs';
+import path from 'path';
 
-// Hardcoded URL - replace if needed
 const FBREF_URL = 'https://fbref.com/en/squads/206d90db/2024-2025/all_comps/Barcelona-Stats-All-Competitions';
+const CACHE_FILE_PATH = path.join(__dirname, '../data/teamStats.json');  // Save JSON file in /data folder
 
 export const scrapeTeamStats = async () => {
   try {
     console.log(`Scraping data from: ${FBREF_URL}`);
-    
+
     // Add browser-like headers to prevent blocking
     const response = await fetch(FBREF_URL);
 
@@ -55,9 +57,26 @@ export const scrapeTeamStats = async () => {
       tablesData[tableId] = rows;
     }
 
+    // Save data to JSON file
+    fs.writeFileSync(CACHE_FILE_PATH, JSON.stringify(tablesData, null, 2));
+    console.log('✅ Data saved to cache');
+
     return tablesData;
   } catch (error) {
     console.error('❌ Scraping failed:', error);
     throw new Error(`Scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+};
+
+export const getCachedTeamStats = () => {
+  try {
+    if (fs.existsSync(CACHE_FILE_PATH)) {
+      const rawData = fs.readFileSync(CACHE_FILE_PATH, 'utf-8');
+      return JSON.parse(rawData);
+    }
+    return null;
+  } catch (error) {
+    console.error('❌ Error reading cache:', error);
+    return null;
   }
 };

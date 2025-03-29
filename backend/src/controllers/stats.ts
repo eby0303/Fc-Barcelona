@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import SeasonPerformance from '../models/SeasonPerformance';
 import Team from '../models/Team';
-import { scrapeTeamStats } from '../services/scrapeService';
+import { getCachedTeamStats, scrapeTeamStats } from '../services/scrapeService';
 // import { updateAllData } from '../services/dataUpdateService';
 
 export const getSeasonStats = async (req: Request, res: Response) => {
@@ -23,12 +23,20 @@ export const getSeasonStats = async (req: Request, res: Response) => {
 
 export const getTeamStats = async (req: Request, res: Response) => {
   try {
+    const cachedData = getCachedTeamStats();
+    if (cachedData) {
+      console.log('📂 Serving cached data');
+      return res.json(cachedData);
+    }
+
+    console.log('🔄 No cache found, scraping data...');
     const teamStats = await scrapeTeamStats();
     res.json(teamStats);
   } catch (error) {
-    res.status(500).json({ message: 'Error scraping team stats' });
+    res.status(500).json({ message: 'Error fetching team stats' });
   }
 };
+
 
 // export const getSquadHealth = async (req: Request, res: Response) => {
 //   try {
