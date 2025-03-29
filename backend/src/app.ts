@@ -6,6 +6,7 @@ import matchesRouter from './routes/matches';
 import playersRouter from './routes/players';
 import statsRouter from './routes/stats';
 import teamRouter from './routes/teaminfo';
+import newsRouter from './routes/news';
 // import updateRouter from './routes/update';
 
 dotenv.config();
@@ -22,6 +23,7 @@ app.use('/api/matches', matchesRouter);
 app.use('/api/players', playersRouter);
 app.use('/api/stats', statsRouter);
 app.use('/api/team-info', teamRouter);
+app.use('/api/news', newsRouter);
 // app.use('/api/update', updateRouter);
 
 // Start server
