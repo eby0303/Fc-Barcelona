@@ -55,10 +55,9 @@ export const scrapeBarcaNews = async (includeToday = false) => {
       const articleLink = $entry.find('a[href*="/202"]').first();
       const articleUrl = articleLink.attr('href') || '';
       
-      // More flexible image selection
-      const img = $entry.find('img[src*="vox-cdn.com"], img.c-dynamic-image').first();
-      const imgUrl = img.attr('src') || '';
-      
+      // Improved image selection with multiple fallbacks
+      const img = $entry.find('img.c-dynamic-image[data-chorus-optimize-field="main_image"], img[src*="vox-cdn.com"]').first();
+      let imgUrl = img.attr('src') || img.attr('data-src') || img.attr('data-lazy-src') || '';    
       // More flexible date selection
       const dateElement = $entry.find('time, .c-byline time, .c-meta__item time').first();
       const articleDate = dateElement.text().trim().replace(/\s+/g, ' ');
