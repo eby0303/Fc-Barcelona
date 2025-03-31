@@ -25,7 +25,7 @@ export const getUpcomingMatches = async (req: Request, res: Response) => {
     // This will automatically handle the 24h check and delete/insert if needed
     await updateMatches();
     
-    const matches = await Match.find({ status: 'SCHEDULED' })
+    const matches = await Match.find({ status: 'TIMED' })
       .sort({ utcDate: 1 })
       .limit(10);
       

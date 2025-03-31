@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db';
-import { scrapeTeamStats } from './services/scrapeService';
 import matchesRouter from './routes/matches';
 import playersRouter from './routes/players';
 import statsRouter from './routes/stats';
@@ -33,8 +32,3 @@ connectDB().then(() => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 });
-
-setInterval(async () => {
-  console.log('⏳ Running periodic scraping...');
-  await scrapeTeamStats();
-}, 12 * 60 * 60 * 1000); // 12 hours

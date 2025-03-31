@@ -31,3 +31,5 @@ export const getTeamInfo = async (req: Request, res: Response) => {
       });
     }
   };
+
+  

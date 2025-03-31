@@ -1,6 +1,7 @@
 import Match from '../models/Match';
 import SeasonPerformance from '../models/SeasonPerformance';
 import { fetchMatches, fetchSeasonPerformance } from '../services/apiService';
+import { scrapeTeamStats, isTeamStatsOutdated, getCachedTeamStats } from '../services/scrapeService';
 
 /**
  * Checks if data is older than 24 hours
@@ -79,10 +80,28 @@ export const updateSeasonPerformance = async (): Promise<void> => {
   }
 };
 
+
+export const updateTeamStats = async (): Promise<void> => {
+  try {
+    const cachedData = getCachedTeamStats();
+    
+    if (!cachedData || isTeamStatsOutdated(cachedData.lastUpdated)) {
+      console.log("⏳ Updating Team Stats...");
+      await scrapeTeamStats();
+      console.log("✅ Team Stats updated successfully.");
+    } else {
+      console.log("✅ Team Stats are up to date.");
+    }
+  } catch (error) {
+    console.error("❌ Error updating team stats:", error);
+  }
+};
+
 /**
  * Runs all update functions
  */
 export const updateAllData = async (): Promise<void> => {
   await updateMatches();
   await updateSeasonPerformance();
+  await updateTeamStats();
 };

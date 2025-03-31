@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import SeasonPerformance from '../models/SeasonPerformance';
 import Team from '../models/Team';
 import { getCachedTeamStats, scrapeTeamStats } from '../services/scrapeService';
-import { updateSeasonPerformance } from '../services/dataUpdateService';
+import { updateSeasonPerformance, updateTeamStats } from '../services/dataUpdateService';
 
 export const getSeasonStats = async (req: Request, res: Response) => {
   try {
@@ -26,13 +26,15 @@ export const getSeasonStats = async (req: Request, res: Response) => {
 
 export const getTeamStats = async (req: Request, res: Response) => {
   try {
+    // This will automatically handle the 24h check and update if needed
+    await updateTeamStats();
+    
     const cachedData = getCachedTeamStats();
-    if (cachedData) {
-      return res.json(cachedData);
+    if (!cachedData) {
+      return res.status(404).json({ message: 'Team stats data not found' });
     }
 
-    const teamStats = await scrapeTeamStats();
-    res.json(teamStats);
+    res.json(cachedData.stats);
   } catch (error) {
     res.status(500).json({ 
       message: 'Error fetching team stats',
@@ -70,3 +72,4 @@ export const getTeamInfo = async (req: Request, res: Response) => {
     });
   }
 };
+

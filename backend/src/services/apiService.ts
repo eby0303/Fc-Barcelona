@@ -150,19 +150,19 @@ export const fetchSeasonPerformance = async () => {
 };
 
 // ✅ Fetch Squad Health (Custom Logic)
-export const fetchSquadHealth = async () => {
-  console.log(`🔍 Fetching Squad Health (Manual Placeholder)`);
+// export const fetchSquadHealth = async () => {
+//   console.log(`🔍 Fetching Squad Health (Manual Placeholder)`);
   
-  // No direct API support, needs manual tracking of injuries/suspensions
-  return {
-    availablePlayers: 22, // Placeholder value
-    injuredPlayers: [],
-    suspendedPlayers: [],
-    positionAvailability: {
-      defenders: { available: 5, total: 7 },
-      midfielders: { available: 6, total: 8 },
-      forwards: { available: 5, total: 7 }
-    },
-    lastUpdated: new Date()
-  };
-};
+//   // No direct API support, needs manual tracking of injuries/suspensions
+//   return {
+//     availablePlayers: 22, // Placeholder value
+//     injuredPlayers: [],
+//     suspendedPlayers: [],
+//     positionAvailability: {
+//       defenders: { available: 5, total: 7 },
+//       midfielders: { available: 6, total: 8 },
+//       forwards: { available: 5, total: 7 }
+//     },
+//     lastUpdated: new Date()
+//   };
+// };

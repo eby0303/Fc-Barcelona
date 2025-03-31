@@ -4,13 +4,17 @@ import fs from 'fs';
 import path from 'path';
 
 const FBREF_URL = 'https://fbref.com/en/squads/206d90db/2024-2025/all_comps/Barcelona-Stats-All-Competitions';
-const CACHE_FILE_PATH = path.join(__dirname, '../data/teamStats.json');  // Save JSON file in /data folder
+const CACHE_FILE_PATH = path.join(__dirname, '../data/teamStats.json');
 
-export const scrapeTeamStats = async () => {
+interface CachedTeamStats {
+  stats: Record<string, any[]>;
+  lastUpdated: string; // ISO string format
+}
+
+export const scrapeTeamStats = async (): Promise<CachedTeamStats> => {
   try {
     console.log(`Scraping data from: ${FBREF_URL}`);
 
-    // Add browser-like headers to prevent blocking
     const response = await fetch(FBREF_URL);
 
     if (!response.ok) {
@@ -20,7 +24,6 @@ export const scrapeTeamStats = async () => {
     const body = await response.text();
     const $ = cheerio.load(body);
 
-    // Tables
     const tableIds = [
       'stats_standard_combined',  // All competitions
       'stats_standard_12',       // La Liga
@@ -57,18 +60,23 @@ export const scrapeTeamStats = async () => {
       tablesData[tableId] = rows;
     }
 
+    const dataToCache: CachedTeamStats = {
+      stats: tablesData,
+      lastUpdated: new Date().toISOString()
+    };
+
     // Save data to JSON file
-    fs.writeFileSync(CACHE_FILE_PATH, JSON.stringify(tablesData, null, 2));
+    fs.writeFileSync(CACHE_FILE_PATH, JSON.stringify(dataToCache, null, 2));
     console.log('✅ Data saved to cache');
 
-    return tablesData;
+    return dataToCache;
   } catch (error) {
     console.error('❌ Scraping failed:', error);
     throw new Error(`Scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 };
 
-export const getCachedTeamStats = () => {
+export const getCachedTeamStats = (): CachedTeamStats | null => {
   try {
     if (fs.existsSync(CACHE_FILE_PATH)) {
       const rawData = fs.readFileSync(CACHE_FILE_PATH, 'utf-8');
@@ -79,4 +87,10 @@ export const getCachedTeamStats = () => {
     console.error('❌ Error reading cache:', error);
     return null;
   }
+};
+
+// Helper function to check if data is outdated
+export const isTeamStatsOutdated = (lastUpdated: string): boolean => {
+  const hoursPassed = (new Date().getTime() - new Date(lastUpdated).getTime()) / (1000 * 60 * 60);
+  return hoursPassed >= 24;
 };
