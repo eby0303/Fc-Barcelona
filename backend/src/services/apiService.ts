@@ -135,11 +135,11 @@ export const fetchSeasonPerformance = async () => {
       position: barcaStats.position,  
       wins: barcaStats.won,
       draws: barcaStats.draw,
-      losses: barcaStats.lost,// Need to calculate from match results
+      losses: barcaStats.lost,
       goalsFor: barcaStats.goalsFor,
       goalsAgainst: barcaStats.goalsAgainst,
       goalDifference : barcaStats.goalDifference,
-      form: barcaStats.form?.split(",") || [], // Some APIs provide form as a string
+      form: barcaStats.form?.split(",") || [], 
       lastUpdated: new Date()
     };
   } catch (error) {

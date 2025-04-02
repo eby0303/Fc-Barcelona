@@ -8,7 +8,7 @@ const CACHE_FILE_PATH = path.join(__dirname, '../data/teamStats.json');
 
 interface CachedTeamStats {
   stats: Record<string, any[]>;
-  lastUpdated: string; // ISO string format
+  lastUpdated: string; 
 }
 
 export const scrapeTeamStats = async (): Promise<CachedTeamStats> => {

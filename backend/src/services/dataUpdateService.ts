@@ -63,7 +63,7 @@ export const updateSeasonPerformance = async (): Promise<void> => {
       if (newPerformance) {
         await SeasonPerformance.deleteMany({});
         
-        // Just add the timestamp to the raw API data
+        // add the timestamp to the raw API data
         const performanceWithTimestamp = {
           ...newPerformance,
           lastUpdated: new Date()
