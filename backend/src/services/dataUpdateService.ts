@@ -38,8 +38,32 @@ export const updateMatches = async (): Promise<void> => {
           lastUpdated: new Date()
         }));
 
-        await Match.insertMany(matchesWithTimestamp);
-        console.log(`✅ Matches updated successfully. (${finishedMatches.length} finished, ${scheduledMatches.length} scheduled)`);
+        try {
+          await Match.insertMany(matchesWithTimestamp);
+          console.log(`✅ Matches updated successfully. (${finishedMatches.length} finished, ${scheduledMatches.length} scheduled)`);
+        } catch (insertError: any) {
+          console.error("❌ Error inserting matches:", insertError.message);
+          
+          // Log validation errors in more detail
+          if (insertError.errors) {
+            Object.keys(insertError.errors).forEach(key => {
+              console.error(`Validation error for ${key}: ${insertError.errors[key].message}`);
+            });
+          }
+          
+          // Try inserting one by one to identify problematic records
+          console.log("Attempting to insert matches one by one to identify issues...");
+          for (let i = 0; i < matchesWithTimestamp.length; i++) {
+            try {
+              await new Match(matchesWithTimestamp[i]).save();
+            } catch (singleError: any) {
+              console.error(`Failed to insert match at index ${i}:`, singleError.message);
+              console.error("Problematic match data:", JSON.stringify(matchesWithTimestamp[i], null, 2));
+            }
+          }
+        }
+      } else {
+        console.log("⚠️ No matches returned from API");
       }
     } else {
       console.log("✅ Matches are up to date.");

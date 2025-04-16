@@ -11,7 +11,7 @@ const getHeaders = () => ({
   }
 });
 
-// ✅ Fetch Barcelona Team Info
+//  Fetch Barcelona Team Info
 export const fetchBarcelonaTeamInfo = async (): Promise<TeamDocument | null> => {
   const url = `${API_BASE_URL}/teams/${BARCELONA_TEAM_ID}`;
   console.log("🔍 Fetching from API:", url);
@@ -37,29 +37,37 @@ export const fetchMatches = async (status: 'SCHEDULED' | 'FINISHED', count = 5):
     const response = await axios.get(url, getHeaders());
     console.log(`📌 Matches API Response (${status}):`, response.data.matches.length);
 
-    return response.data.matches.map((match: any) => ({
-      matchId: match.id,
-      utcDate: match.utcDate,
-      status: match.status,
-      matchday: match.matchday,
-      competition: match.competition.name,
-      stage: match.stage,
-      homeTeam: {
-        id: match.homeTeam.id,
-        name: match.homeTeam.name,
-        crest: match.homeTeam.crest // Ensure crest is available
-      },
-      awayTeam: {
-        id: match.awayTeam.id,
-        name: match.awayTeam.name,
-        crest: match.awayTeam.crest // Ensure crest is available
-      },
-      score: {
-        fullTime: match.score.fullTime || { home: null, away: null },
-        halfTime: match.score.halfTime || { home: null, away: null },
-      },
-      lastUpdated: new Date(match.lastUpdated),
-    }));
+    return response.data.matches.map((match: any) => {
+      // Ensure all required fields are present
+      if (!match.homeTeam || !match.awayTeam) {
+        console.warn(`⚠️ Missing team data in match: ${match.id}`);
+        return null;
+      }
+
+      return {
+        matchId: match.id,
+        utcDate: match.utcDate,
+        status: match.status,
+        matchday: match.matchday,
+        competition: match.competition.name,
+        stage: match.stage,
+        homeTeam: {
+          id: match.homeTeam.id || 0,
+          name: match.homeTeam.name || 'Unknown Team',
+          crest: match.homeTeam.crest || 'https://example.com/default-crest.png'
+        },
+        awayTeam: {
+          id: match.awayTeam.id || 0,
+          name: match.awayTeam.name || 'Unknown Team',
+          crest: match.awayTeam.crest || 'https://example.com/default-crest.png'
+        },
+        score: {
+          fullTime: match.score.fullTime || { home: null, away: null },
+          halfTime: match.score.halfTime || { home: null, away: null },
+        },
+        lastUpdated: new Date(match.lastUpdated),
+      };
+    }).filter(Boolean); // Remove any null entries
   } catch (error) {
     const axiosError = error as AxiosError;
     console.error("❌ API Football matches error:", axiosError.response?.data || axiosError.message);
@@ -82,7 +90,7 @@ export const fetchPlayers = async (): Promise<PlayerDocument[]> => {
   }
 };
 
-// ✅ Fetch Team Stats
+//  Fetch Team Stats
 export const fetchTeamStats = async () => {
   const url = `${API_BASE_URL}/competitions/PD/standings`;
   console.log("🔍 Fetching from API:", url);
@@ -114,7 +122,7 @@ export const fetchTeamStats = async () => {
   }
 };
 
-// ✅ Fetch League Standings
+//  Fetch League Standings
 export const fetchSeasonPerformance = async () => {
   const url = `${API_BASE_URL}/competitions/PD/standings`;
   console.log("🔍 Fetching from API:", url);
